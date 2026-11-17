@@ -1,6 +1,7 @@
 import streamlit as st
 import pandas as pd
 import plotly.express as px
+import os
 from sqlalchemy import create_engine
 
 # Configuración de la página
@@ -22,6 +23,17 @@ def get_engine():
 
 @st.cache_data(ttl=600)
 def load_data():
+    base_dir = os.path.dirname(os.path.abspath(__file__))
+    p_temp = os.path.join(base_dir, "fact_tendencia_temporal.parquet")
+    
+    if os.path.exists(p_temp):
+        return (
+            pd.read_parquet(os.path.join(base_dir, "fact_tendencia_temporal.parquet")),
+            pd.read_parquet(os.path.join(base_dir, "fact_patron_horario.parquet")),
+            pd.read_parquet(os.path.join(base_dir, "fact_resumen_distrito.parquet")),
+            pd.read_parquet(os.path.join(base_dir, "fact_mapa_puntos.parquet")),
+        )
+        
     engine = get_engine()
     df_temp = pd.read_sql("SELECT * FROM fact_tendencia_temporal", engine)
     df_hora = pd.read_sql("SELECT * FROM fact_patron_horario", engine)
